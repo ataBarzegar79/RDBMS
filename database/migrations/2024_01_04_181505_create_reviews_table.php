@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id');
+            $table->morphs('reviewable');
             $table->string('content');
             $table->integer('rate');
             $table->timestamps();
