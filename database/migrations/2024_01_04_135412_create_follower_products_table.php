@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('follower_products', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->timestamp('deleted_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->unsignedFloat('price_per_follower');
+            $table->string('provider_name')->unique();
+            $table->unsignedInteger('service_quantity');
+            $table->string('follower_charge_speed');
+            $table->timestamp('deleted_at');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('follower_products');
     }
 };
