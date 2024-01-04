@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('page_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->string('username')->unique();
             $table->unsignedInteger('follower_count');
             $table->unsignedInteger('following_count');

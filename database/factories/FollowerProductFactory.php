@@ -18,7 +18,6 @@ class FollowerProductFactory extends Factory
     public function definition(): array
     {
         return [
-            "product_id" => Product::factory(),
             "price_per_follower" => fake()->randomFloat(),
             "provider_name" => fake()->unique()->name(),
             "service_quantity" => fake()->randomDigit(),

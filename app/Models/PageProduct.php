@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class PageProduct extends Model
 {
     use HasFactory;
+
+    public function product()
+    {
+        return $this->morphOne(Product::class, 'producible');
+    }
 }
