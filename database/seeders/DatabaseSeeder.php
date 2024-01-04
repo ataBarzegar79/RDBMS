@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        InstagramPage::factory(5)->create();
+        Product::factory(5)->create();
         // todo: fix polymorphic factories
     }
 }

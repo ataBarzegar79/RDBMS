@@ -17,6 +17,7 @@ return new class extends Migration
             $table->float('price_per_followers');
             $table->string('provider_name');
             $table->float('service_quality');
+            $table->string('speed_of_follower_charging');
             $table->timestamps();
         });
     }

@@ -19,10 +19,11 @@ class InstagramFollowerFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory()->create(['productable_type' => InstagramFollower::class]),
+            'product_id' => Product::factory()->create(['productable_id' => 1]),
             'price_per_followers' => $this->faker->randomFloat(min: 1, max: 20),
             'provider_name' => $this->faker->name,
             'service_quality' => $this->faker->numberBetween(1,10),
+            'speed_of_follower_charging' => $this->faker->sentence,
         ];
     }
 }

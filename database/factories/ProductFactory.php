@@ -23,8 +23,8 @@ class ProductFactory extends Factory
             'price' => $this->faker->numberBetween(1,10),
             'quantity' => $this->faker->numberBetween(0,10000),
             'is_active' => $this->faker->boolean,
-            'productable_id' => 1,
-            'productable_type' => '',
+            'productable_id' => InstagramFollower::factory(),
+            'productable_type' => InstagramFollower::class,
         ];
     }
 }

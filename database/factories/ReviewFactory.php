@@ -21,8 +21,8 @@ class ReviewFactory extends Factory
         return [
             'content' => $this->faker->paragraph,
             'rate' => $this->faker->numberBetween(0,10),
-            'reviewable_id' => 1,
-            'reviewable_type' => '',
+            'reviewable_id' => Product::factory(),
+            'reviewable_type' => Product::class,
         ];
     }
 }

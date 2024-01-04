@@ -19,7 +19,7 @@ class InstagramPageFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory()->create(['productable_type' => InstagramPage::class]),
+            'product_id' => Product::factory()->create(['productable_id' => 1]),
             'followers' => $this->faker->numberBetween(),
             'following' => $this->faker->numberBetween(),
             'visibility' => $this->faker->boolean,
