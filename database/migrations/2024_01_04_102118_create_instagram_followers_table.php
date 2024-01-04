@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('instagram_followers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained();
+            $table->float('price_per_followers');
+            $table->string('provider_name')->unique();
+            $table->float('service_quality');
             $table->timestamps();
         });
     }

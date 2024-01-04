@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('instagram_pages', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('product_id')->constrained();
+            $table->integer('followers');
+            $table->integer('following');
+            $table->boolean('visibility');
+            $table->string('username')->unique();
+            $table->string('bio');
         });
     }
 
