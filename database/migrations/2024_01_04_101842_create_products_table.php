@@ -16,6 +16,8 @@ return new class extends Migration
             $table->float('price');
             $table->integer('quantity');
             $table->boolean('is_active');
+            $table->integer('productable_id');
+            $table->string('productable_type');
             $table->timestamp('created_at');
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('deleted_at')->nullable();

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained();
             $table->float('price_per_followers');
-            $table->string('provider_name')->unique();
+            $table->string('provider_name');
             $table->float('service_quality');
             $table->timestamps();
         });

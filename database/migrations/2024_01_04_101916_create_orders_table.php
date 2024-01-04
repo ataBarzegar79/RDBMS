@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
+            $table->float('price');
             $table->enum('status',[OrderStatusEnum::UNCOMPLETED->value,OrderStatusEnum::COMPLETED->value]);
             $table->timestamp('created_at');
             $table->timestamp('updated_at')->nullable();
