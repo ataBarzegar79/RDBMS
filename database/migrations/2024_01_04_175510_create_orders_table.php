@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id');
+            $table->morphs('reviewable');
             $table->enum('status',[StatusEnum::SOLD->value,StatusEnum::NOTSOLD->value]);
             $table->timestamps();
             $table->softDeletes();

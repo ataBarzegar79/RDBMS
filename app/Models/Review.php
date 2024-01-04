@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Categories extends Model
+class Review extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,SoftDeletes;
 
-    public function product()
+    public function reviewable()
     {
-        return $this->belongsTo(Product::class);
+        return $this->morphTo();
     }
 }
