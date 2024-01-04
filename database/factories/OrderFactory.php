@@ -20,8 +20,8 @@ class OrderFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'price' => $this->faker->numberBetween(),
-            'status' => $this->faker->shuffleArray([OrderStatusEnum::UNCOMPLETED->value,OrderStatusEnum::COMPLETED->value]),
+            'price' => $this->faker->numberBetween(1,1000000),
+            'status' => $this->faker->randomElement([OrderStatusEnum::UNCOMPLETED->value,OrderStatusEnum::COMPLETED->value]),
         ];
     }
 }

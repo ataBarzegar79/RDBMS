@@ -23,8 +23,14 @@ class ProductFactory extends Factory
             'price' => $this->faker->numberBetween(1,10),
             'quantity' => $this->faker->numberBetween(0,10000),
             'is_active' => $this->faker->boolean,
-            'productable_id' => InstagramFollower::factory(),
-            'productable_type' => InstagramFollower::class,
+            'productable_id' => $this->faker->randomElement([
+                InstagramFollower::factory(),
+                InstagramPage::factory(),
+            ]),
+            'productable_type' => $this->faker->randomElement([
+                InstagramFollower::class,
+                InstagramPage::class,
+            ]),
         ];
     }
 }
