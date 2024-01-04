@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('price_per_follower');
             $table->integer('provider_name');
             $table->integer('service_quality');
-            $table->timestamp('speed_of_follower_charging')->nullable();
+            $table->string('speed_of_follower_charging')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
