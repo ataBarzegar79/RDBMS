@@ -1,6 +1,5 @@
 <?php
 
-use App\Enum\StatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('instagram_pages', function (Blueprint $table) {
             $table->id();
-            $table->enum('status',[StatusEnum::SOLD->value,StatusEnum::NOTSOLD->value]);
+            $table->integer('followers_count');
+            $table->integer('following_count');
+            $table->integer('post_count');
+            $table->integer('visibility');
+            $table->string('username');
+            $table->string('bio');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -25,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('instagram_pages');
     }
 };

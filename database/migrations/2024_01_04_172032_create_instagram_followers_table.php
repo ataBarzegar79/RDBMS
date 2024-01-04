@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pages', function (Blueprint $table) {
+        Schema::create('instagram_followers', function (Blueprint $table) {
             $table->id();
-            $table->integer('followers_count');
-            $table->integer('following_count');
-            $table->integer('post_count');
-            $table->integer('visibility');
-            $table->string('username');
-            $table->string('bio');
+            $table->integer('price_per_follower');
+            $table->integer('provider_name');
+            $table->integer('service_quality');
+            $table->timestamp('speed_of_follower_charging')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pages');
+        Schema::dropIfExists('instagram_followers');
     }
 };
