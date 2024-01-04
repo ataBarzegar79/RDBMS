@@ -18,8 +18,7 @@ return new class extends Migration
             $table->boolean('is_active');
             $table->integer('productable_id');
             $table->string('productable_type');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });
     }

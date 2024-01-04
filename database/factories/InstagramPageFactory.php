@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\InstagramPage;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,12 @@ class InstagramPageFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'product_id' => Product::factory()->create(['productable_type' => InstagramPage::class]),
+            'followers' => $this->faker->numberBetween(),
+            'following' => $this->faker->numberBetween(),
+            'visibility' => $this->faker->boolean,
+            'username' => fake()->unique()->name,
+            'bio' => $this->faker->sentence,
         ];
     }
 }

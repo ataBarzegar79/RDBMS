@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('visibility');
             $table->string('username')->unique();
             $table->string('bio');
+            $table->timestamps();
         });
     }
 

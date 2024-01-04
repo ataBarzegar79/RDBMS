@@ -17,8 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->float('price');
             $table->enum('status',[OrderStatusEnum::UNCOMPLETED->value,OrderStatusEnum::COMPLETED->value]);
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });
     }
