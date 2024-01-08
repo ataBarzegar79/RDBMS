@@ -24,4 +24,12 @@ class OrderFactory extends Factory
         ];
     }
 
+    public function withUser(User $user): OrderFactory
+    {
+        return $this->state(
+            [
+                'user_id' => $user
+            ]
+        );
+    }
 }
