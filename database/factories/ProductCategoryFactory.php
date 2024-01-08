@@ -21,4 +21,14 @@ class ProductCategoryFactory extends Factory
             'product_id' => fn()=> $this->faker->unique()->randomNumber(),
         ];
     }
+
+    public function withIds(int $productId,int $categoryId): ProductCategoryFactory
+    {
+        return $this->state(
+            [
+                'product_id' => $productId,
+                'category_id' => $categoryId
+            ]
+        );
+    }
 }

@@ -24,4 +24,22 @@ class OrderFactory extends Factory
         ];
     }
 
+    public function withUser(User $user): OrderFactory
+    {
+        return $this->state(
+            [
+                'user_id' => $user
+            ]
+        );
+    }
+
+    public function withCreatedAt(Carbon $carbon): OrderFactory
+    {
+        return $this->state(
+            [
+                'created_at' => $carbon
+            ]
+        );
+    }
+
 }

@@ -20,10 +20,28 @@ class OrderItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'price' => fn() => $this->faker->randomNumber(),
-            'quantity' => fn() => $this->faker->randomNumber(),
+            'price' => fn() => $this->faker->randomFloat(2, 10, 50),
+            'quantity' => fn() => $this->faker->numberBetween(1, 10),
             'order_id' => fn() => Order::factory()->create(),
             'product_id' => fn() => Product::factory()->create(),
         ];
+    }
+
+    public function withProduct($product): OrderItemFactory
+    {
+        return $this->state(
+            [
+                'product_id' => $product->id
+            ]
+        );
+    }
+
+    public function withOrder($order): OrderItemFactory
+    {
+        return $this->state(
+            [
+                'order_id' => $order->id
+            ]
+        );
     }
 }

@@ -26,4 +26,27 @@ class ReviewFactory extends Factory
             'user_id' => fn() => User::factory()->create(),
         ];
     }
+
+    public function withUser(User $user): ReviewFactory
+    {
+        return $this->state(
+            [
+                'user_id' => $user
+            ]
+        );
+    }
+    function withProducible(int $id, string $type): ReviewFactory
+    {
+        return $this->state([
+            'reviewable_id' => $id,
+            'reviewable_type' => $type
+        ]);
+    }
+
+    function withRate(int $rate): ReviewFactory
+    {
+        return $this->state([
+            'rate' => $rate
+        ]);
+    }
 }

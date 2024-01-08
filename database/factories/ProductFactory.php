@@ -25,4 +25,19 @@ class ProductFactory extends Factory
             'quantity' => fn() => $this->faker->randomNumber(),
         ];
     }
+
+    function withProducible(int $id, string $type): ProductFactory
+    {
+        return $this->state([
+            'producible_id' => $id,
+            'producible_type' => $type
+        ]);
+    }
+
+    public function withProductType(string $type): ProductFactory
+    {
+        return $this->state([
+            'producible_type' => $type
+        ]);
+    }
 }
