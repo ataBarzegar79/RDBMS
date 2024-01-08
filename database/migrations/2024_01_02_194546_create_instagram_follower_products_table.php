@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('instagram_follower_products', function (Blueprint $table) {
             $table->id();
-            $table->decimal('price_per_follower');
+            $table->decimal('price_per_follower',15);
             $table->string('provider_name');
             $table->tinyInteger('service_quality');
             $table->timestamps();
