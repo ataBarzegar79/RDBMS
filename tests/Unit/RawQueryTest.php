@@ -323,20 +323,20 @@ class RawQueryTest extends TestCase
             'reviewable_id' => 1,
             'reviewable_type' => 'Product'
         ]);
-        var_dump(Product::all());
-        //todo: fix condition AVG(rate)
         DB::update('
-                                    UPDATE products
-                                    INNER JOIN (
-                                        SELECT products.id FROM products
-                                        INNER JOIN reviews
-                                        ON (products.id = reviews.reviewable_id)
-                                        WHERE reviewable_type = "Product"
-                                        GROUP BY products.id
-                                        HAVING Avg(rate) > 8
-                                    ) AS Subquery
-                                    ON products.id = Subquery.id
-                                    SET price = price * 1.1
+                                   UPDATE products
+                                    SET price =
+                                        CASE
+                                            WHEN (
+                                                SELECT AVG(rate) FROM reviews
+                                                    WHERE reviewable_id = products.id AND reviewable_type = "Product"
+                                                    ) > 8 THEN price * 1.1
+                                            WHEN (
+                                                SELECT AVG(rate) FROM reviews
+                                                    WHERE reviewable_id = products.id AND reviewable_type = "Product"
+                                                    ) < 4 THEN price * 0.9
+                                            ELSE price
+                                        END;
 
 ');
         dd(Product::all());
