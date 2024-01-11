@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,5 +27,24 @@ class ReviewFactory extends Factory
             'reviewable_type' => fn() => $this->faker->unique()->name,
             'user_id' => fn() => User::factory()->create(),
         ];
+    }
+
+    public function withUser(User $user): ReviewFactory
+    {
+        return $this->state(
+            [
+                'user_id' => $user
+            ]
+        );
+    }
+
+    public function withReviewable(Product|Category $reviewable) : ReviewFactory
+    {
+        return $this->state(
+            [
+                'reviewable_id' => $reviewable,
+                'reviewable_type' => $reviewable::class
+            ]
+        );
     }
 }

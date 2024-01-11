@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\InstagramFollowerProduct;
+use App\Models\InstagramPageProduct;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use PHPUnit\Event\Code\Test;
 
@@ -24,5 +26,15 @@ class ProductFactory extends Factory
             'is_active' => fn() => $this->faker->randomNumber([0, 1]),
             'quantity' => fn() => $this->faker->randomNumber(),
         ];
+    }
+
+    public function withProducible(InstagramFollowerProduct|InstagramPageProduct $producible) : ProductFactory
+    {
+        return $this->state(
+            [
+                'reviewable_id' => $producible,
+                'reviewable_type' => $producible::class
+            ]
+        );
     }
 }
