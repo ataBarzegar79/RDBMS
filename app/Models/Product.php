@@ -13,20 +13,23 @@ class Product extends Model
 {
     use HasFactory;
 
-    public function productable(): MorphTo
+    public function producible(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(__FUNCTION__, 'producible_type', 'producible_id');
     }
-    public function categories(): HasMany
+
+    public function orderItems(): HasMany
     {
-        return $this->hasMany(Category::class);
+        return $this->hasMany(OrderItem::class);
     }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class,'product_category');
+    }
+
     public function reviews(): MorphMany
     {
-        return $this->morphMany(Review::class,'reviewable');
-    }
-    public function orders(): BelongsToMany
-    {
-        return $this->belongsToMany(Order::class);
+        return $this->morphMany(Review::class, 'reviewable');
     }
 }

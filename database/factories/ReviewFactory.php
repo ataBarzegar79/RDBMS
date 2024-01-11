@@ -2,8 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,13 +17,13 @@ class ReviewFactory extends Factory
      */
     public function definition(): array
     {
-        $reviewableType = $this->faker->randomElement([Product::class, Category::class]);
+
         return [
-            'user_id' => User::factory(),
-            'content' => $this->faker->paragraph,
-            'rate' => $this->faker->numberBetween(0,10),
-            'reviewable_id' => $reviewableType::factory(),
-            'reviewable_type' => $reviewableType,
+            'content' => fn() => $this->faker->text(10),
+            'rate' => fn() => $this->faker->numberBetween(1, 10),
+            'reviewable_id' => fn() => $this->faker->unique()->randomDigit(),
+            'reviewable_type' => fn() => $this->faker->unique()->name,
+            'user_id' => fn() => User::factory()->create(),
         ];
     }
 }
