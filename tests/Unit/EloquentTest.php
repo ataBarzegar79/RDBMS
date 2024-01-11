@@ -152,7 +152,7 @@ class EloquentTest extends TestCase
         )->where(
             'reviewable_type',
             '=',
-            'App\\Product'
+            'App\\Models\\Product'
         )->groupBy(
             'products.id',
         )->orderByDesc('Avgrate')
@@ -187,12 +187,12 @@ class EloquentTest extends TestCase
             ->where(
                 'reviews.reviewable_type',
                 '=',
-                'App\\Product'
+                'App\\Models\\Product'
             )
             ->where(
                 'producible_type',
                 '=',
-                'App\\InstagramPageProduct',
+                'App\\Models\\InstagramPageProduct',
             );
         dd($reviewsSpecificProductType->get());
     }
@@ -236,7 +236,7 @@ class EloquentTest extends TestCase
         )->where(
             'producible_type',
             '=',
-            'App\\InstagramPageProduct'
+            'App\\Models\\InstagramPageProduct'
         )->where(
             'orders.created_at',
             '>',
@@ -258,10 +258,10 @@ class EloquentTest extends TestCase
             });
         $instagramPage->each(
             function (InstagramPageProduct $instagramPageProduct) {
-            Product::factory()
-                ->withProducible($instagramPageProduct)
-                ->create();
-        });
+                Product::factory()
+                    ->withProducible($instagramPageProduct)
+                    ->create();
+            });
         $products = Product::all();
         $categories = Category::factory(10)->create();
         $products->each(function (Product $product) use ($categories) {
@@ -272,16 +272,166 @@ class EloquentTest extends TestCase
                     ->create();
             });
         });
-//        $updatePrice = DB::update('
-//                                UPDATE products
-//                                SET price = price + ?
-//                                WHERE id IN (
-//                                    SELECT product_category.product_id
-//                                    FROM product_category
-//                                    INNER JOIN categories ON product_category.category_id = categories.id
-//                                    WHERE (categories.id = ? AND products.producible_type = ?)
-//                                )
-//                                                                          ',[1000,1,'InstagramPageProduct']);
+
+        Product::join(
+            'product_category',
+            'products.id',
+            '=',
+            'product_category.product_id'
+        )
+            ->join(
+                'categories',
+                'product_category.category_id',
+                '=',
+                'categories.id'
+            )
+            ->where(
+                'categories.id',
+                '=',
+                1
+            )
+            ->where(
+                'products.producible_type',
+                '=',
+                'App\\Models\\InstagramPageProduct'
+            )
+            ->update([
+                'products.price' => DB::raw('products.price + 1000')
+            ]);
+
+
         dd(Product::all());
+    }
+
+    public function test_nine()
+    {
+        # Remove users who have not placed any orders in last 7 days and delete their associated orders.
+        $user = User::factory()->create();
+        Order::factory()->withUser($user)->count(15)->create();
+        User::factory()->create();
+        User::join(
+            'orders',
+            'users.id',
+            '=',
+            'orders.user_id'
+        )
+            ->where(
+                'orders.created_at',
+                '>',
+                DB::raw('DATE_SUB(NOW(), INTERVAL 7 DAY)')
+            )
+            ->delete();
+
+        dd(User::all());
+    }
+
+    public function test_ten()
+    {
+        # Insert a User and an order with one page and two follower product.
+        User::insert([
+            'name' => 'sajjad',
+            'email' => 'mohammadisajjad54@gmail.com',
+            'password' => bcrypt(12345678),
+        ]);
+
+        InstagramFollowerProduct::insert([
+            [
+                'price_per_follower' => 10,
+                'provider_name' => 'mohammad',
+                'service_quality' => 10,
+            ],
+            [
+                'price_per_follower' => 12,
+                'provider_name' => 'sajjad',
+                'service_quality' => 8,
+            ],
+        ]);
+
+        InstagramPageProduct::insert([
+            [
+                'follower_count' => 10,
+                'username' => 'mohammad',
+                'following_count' => 10,
+                'is_visible' => true,
+                'posts_count' => 10,
+            ],
+        ]);
+
+        Product::insert([
+            [
+                'price' => 10,
+                'producible_id' => InstagramPageProduct::first()->id,
+                'producible_type' => 'App\\InstagramPageProduct',
+            ],
+            [
+                'price' => 12,
+                'producible_id' => InstagramFollowerProduct::first()->id,
+                'producible_type' => 'App\\InstagramFollowerProduct',
+            ],
+            [
+                'price' => 14,
+                'producible_id' => InstagramFollowerProduct::find(2)->id,
+                'producible_type' => 'App\\InstagramFollowerProduct',
+            ],
+        ]);
+
+        Order::insert([
+            [
+                'status' => 'completed',
+                'user_id' => 1,
+            ],
+        ]);
+
+        OrderItem::insert([
+            [
+                'product_id' => 1,
+                'quantity' => 1,
+                'price' => 10,
+                'order_id' => 1,
+            ],
+            [
+                'product_id' => 2,
+                'quantity' => 1,
+                'price' => 20,
+                'order_id' => 1,
+            ],
+            [
+                'product_id' => 3,
+                'quantity' => 1,
+                'price' => 30,
+                'order_id' => 1,
+            ],
+        ]);
+        dd(Order::get());
+    }
+
+    public function test_eleven()
+    {
+        // Increase the prices of products with high average ratings and decrease the
+        // prices of products with low average ratings. if(less than 4) * 0.9
+        // if(more than 8) * 1.1
+
+        $products = Product::factory(10)->create();
+        $products->each(function (Product $product) {
+            Review::factory()->withReviewable($product)->create();
+        });
+        Review::factory(10)->withReviewable($products[0])->create();
+        Product::query()
+            ->update([
+                'price' => DB::raw('
+            CASE
+                WHEN (
+                    SELECT AVG(rate) FROM reviews
+                    WHERE reviewable_id = products.id AND reviewable_type = "Product"
+                ) > 8 THEN price * 1.1
+                WHEN (
+                    SELECT AVG(rate) FROM reviews
+                    WHERE reviewable_id = products.id AND reviewable_type = "Product"
+                ) < 4 THEN price * 0.9
+                ELSE price
+            END
+        ')
+            ]);
+        dd(Product::get());
     }
 }
