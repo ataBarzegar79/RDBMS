@@ -2,11 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
  */
 class CategoryFactory extends Factory
 {
@@ -18,8 +17,7 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory(),
-            'name' => $this->faker->name
+            'name' => fn() => $this->faker->unique()->name,
         ];
     }
 }

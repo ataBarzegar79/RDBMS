@@ -2,10 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Enum\StatusEnum;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Order>
@@ -20,9 +19,17 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory(),
-            'user_id' => User::factory(),
-            'status' => $this->faker->randomElement([StatusEnum::SOLD->value,StatusEnum::NOTSOLD->value])
+            'status' => fn() => $this->faker->randomElement(['completed', 'uncompleted']),
+            'user_id' => fn() => User::factory()->create(),
         ];
+    }
+
+    public function withUser(User $user): OrderFactory
+    {
+        return $this->state(
+            [
+                'user_id' => $user
+            ]
+        );
     }
 }

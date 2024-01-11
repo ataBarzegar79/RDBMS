@@ -4,19 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Review extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    public function reviewable()
+    public function user(): HasOne
     {
-        return $this->morphTo();
+        return $this->hasOne(User::class);
     }
 
-    public function user()
+    public function reviewable(): MorphTo
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo(Review::class, 'reviewable_type', 'reviewable_id');
     }
+
 }

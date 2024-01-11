@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Enum\ActiveEnum;
-use App\Models\InstagramFollower;
-use App\Models\InstagramPage;
+use App\Models\InstagramFollowerProduct;
+use App\Models\InstagramPageProduct;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use PHPUnit\Event\Code\Test;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
  */
 class ProductFactory extends Factory
 {
@@ -20,11 +20,21 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'price' => $this->faker->numberBetween(),
-            'productable_type' => $this->faker->randomElement([InstagramFollower::class, InstagramPage::class]),
-            'productable_id' => $this->faker->randomElement([InstagramFollower::factory(), InstagramPage::factory()]),
-            'quantity' => $this->faker->numberBetween(1,10),
-            'is_active' => $this->faker->randomElement([ActiveEnum::ACTIVE->value,ActiveEnum::INACTIVE->value])
+            'price' => fn() => $this->faker->randomFloat(2, 10, 50),
+            'producible_id' => fn() => $this->faker->unique()->numberBetween(1, 10000),
+            'producible_type' => fn() => $this->faker->unique()->name,
+            'is_active' => fn() => $this->faker->randomNumber([0, 1]),
+            'quantity' => fn() => $this->faker->randomNumber(),
         ];
+    }
+
+    public function withProducible(InstagramFollowerProduct|InstagramPageProduct $producible) : ProductFactory
+    {
+        return $this->state(
+            [
+                'reviewable_id' => $producible,
+                'reviewable_type' => $producible::class
+            ]
+        );
     }
 }

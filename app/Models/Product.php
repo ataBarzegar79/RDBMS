@@ -4,29 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    public function productable()
+    public function producible(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(__FUNCTION__, 'producible_type', 'producible_id');
     }
 
-    public function order()
+    public function orderItems(): HasMany
     {
-        return $this->belongsTo(Order::class);
+        return $this->hasMany(OrderItem::class);
     }
 
-    public function categories()
+    public function categories(): BelongsToMany
     {
-        return $this->hasMany(Category::class);
+        return $this->belongsToMany(Category::class,'product_category');
     }
 
-    public function review()
+    public function reviews(): MorphMany
     {
-        return $this->morphMany(Review::class,'reviewable');
+        return $this->morphMany(Review::class, 'reviewable');
     }
 }

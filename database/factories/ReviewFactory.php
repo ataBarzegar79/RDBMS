@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Review>
  */
 class ReviewFactory extends Factory
 {
@@ -19,12 +19,32 @@ class ReviewFactory extends Factory
      */
     public function definition(): array
     {
+
         return [
-            'user_id' => User::factory(),
-            'reviewable_type' => $this->faker->randomElement([Category::class, Product::class]),
-            'reviewable_id' => $this->faker->randomElement([Category::factory(), Product::factory()]),
-            'content' => $this->faker->text,
-            'rate' => $this->faker->numberBetween()
+            'content' => fn() => $this->faker->text(10),
+            'rate' => fn() => $this->faker->numberBetween(1, 10),
+            'reviewable_id' => fn() => $this->faker->unique()->randomDigit(),
+            'reviewable_type' => fn() => $this->faker->unique()->name,
+            'user_id' => fn() => User::factory()->create(),
         ];
+    }
+
+    public function withUser(User $user): ReviewFactory
+    {
+        return $this->state(
+            [
+                'user_id' => $user
+            ]
+        );
+    }
+
+    public function withReviewable(Product|Category $reviewable) : ReviewFactory
+    {
+        return $this->state(
+            [
+                'reviewable_id' => $reviewable,
+                'reviewable_type' => $reviewable::class
+            ]
+        );
     }
 }
