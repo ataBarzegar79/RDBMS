@@ -26,4 +26,22 @@ class OrderItemFactory extends Factory
             'product_id' => fn() => Product::factory()->create(),
         ];
     }
+
+    public function withOrder(Order $order): OrderItemFactory
+    {
+        return $this->state(
+            [
+                'order_id' => $order
+            ]
+        );
+    }
+
+    public function withProduct(Product $product): OrderItemFactory
+    {
+        return $this->state(
+            [
+                'product_id' => $product
+            ]
+        );
+    }
 }
