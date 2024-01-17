@@ -3,6 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Category;
+use App\Models\InstagramFollowerProduct;
+use App\Models\InstagramPageProduct;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -34,11 +36,14 @@ class RawQueryTest extends TestCase
         $user = User::factory()->create();
         Order::factory()->withUser($user)->count(15)->create();
         $query = DB::select(
-            "SELECT users.*,orders.status
-                   FROM orders
-                   INNER JOIN users ON orders.user_id = users.id AND status IN('uncompleted')
-                   "
-        );
+            "SELECT
+                users.*,
+                orders.status
+             FROM
+                orders
+                INNER JOIN users ON orders.user_id = users.id
+                AND status IN('uncompleted')
+      ");
         dd($query);
     }
 
@@ -46,14 +51,17 @@ class RawQueryTest extends TestCase
     {
         $product = Product::factory()->create();
         $category = Category::factory()->create();
+        Product::factory()->create();
         ProductCategory::factory()->withProduct($product)->withCategory($category)->count(5)->create();
 
         $query = DB::select("
-            SELECT products.*,categories.*
-            FROM product_category
-            JOIN products
-            LEFT JOIN categories ON product_category.product_id = products.id
-            AND product_category.category_id = categories.id
+            SELECT
+                products.*,
+                categories.*
+            FROM
+                products
+                LEFT JOIN product_category ON product_category.product_id = products.id
+                LEFT JOIN categories ON product_category.category_id = categories.id
         ");
 
         dd($query);
@@ -66,11 +74,16 @@ class RawQueryTest extends TestCase
         ProductCategory::factory()->withProduct($product)->withCategory($category)->count(5)->create();
 
         $query = DB::select("
-                  SELECT categories.id,categories.name ,COUNT(product_category.product_id) AS product_count
-                  FROM product_category
-                  INNER JOIN (products,categories) ON product_category.category_id = categories.id
-                  AND product_category.product_id = products.id
-                  GROUP BY categories.id,categories.name
+                 SELECT
+                    categories.id,
+                    categories.name,
+                    COUNT(product_category.product_id) AS product_count
+                FROM
+                    categories
+                    LEFT JOIN product_category ON product_category.category_id = categories.id
+                GROUP BY
+                    categories.id,
+                    categories.name
         ");
 
         dd($query);
@@ -78,30 +91,53 @@ class RawQueryTest extends TestCase
 
     #[NoReturn] public function test_four()
     {
-        OrderItem::factory(5)->create();
 
-        $query = DB::select('
-        SELECT order_items.id,order_items.price,order_items.quantity,order_items.price*order_items.quantity
-        AS multpy
-        FROM order_items
-        GROUP BY order_items.id,order_items.price,order_items.quantity
-        ');
+        $instagram = InstagramFollowerProduct::factory()->create();
+        $product = Product::factory()->withProducible($instagram)->create();
+        OrderItem::factory(5)->withProduct($product)->create();
+
+        $query = DB::select("
+                SELECT
+                    products.producible_id,
+                     products.producible_type,
+                    SUM(order_items.price * order_items.quantity) AS  revenue
+                FROM
+                    products
+                    LEFT JOIN order_items ON products.id = order_items.product_id
+                    LEFT JOIN orders ON orders.id = order_items.order_id
+                WHERE
+                    products.producible_type = ? AND orders.status = 'completed'
+                GROUP BY
+                    products.producible_id,
+                     products.producible_type
+        ",[$instagram::class]);
         dd($query);
     }
 
     #[NoReturn] public function test_five()
     {
-        Review::factory(10)->create();
+        $product = Product::factory()->create();
+        Review::factory()->withReviewable($product)->count(10)->create();
         $query = DB::select('
-            SELECT reviews.id,reviews.content,reviews.rate,reviews.reviewable_type,reviews.reviewable_id,
-            AVG(reviews.rate)
-            AS avgs
-            FROM reviews
-            GROUP BY reviews.id,reviews.content,reviews.rate,
-            reviews.reviewable_type,reviews.reviewable_id
-            ORDER BY avgs
-            DESC LIMIT 5
-        ');
+            SELECT
+                products.id,
+                products.price,
+                reviews.reviewable_type,
+                AVG(reviews.rate) AS avgs
+            FROM
+                products
+            LEFT JOIN reviews ON products.id = reviews.reviewable_id
+            WHERE
+                reviews.reviewable_type = ?
+            GROUP BY
+                products.id,
+                products.price,
+                reviews.reviewable_type
+            ORDER BY
+                avgs DESC
+            LIMIT
+                5
+        ',[$product::class]);
 
         dd($query);
     }
@@ -112,63 +148,75 @@ class RawQueryTest extends TestCase
         Review::factory()->withReviewable($product)->count(5)->create();
 
         $query = DB::select("
-            SELECT products.* , reviews.*
-            FROM products
-            LEFT JOIN reviews
-            ON reviews.reviewable_type = 'product'
-            AND reviews.reviewable_id = products.id
-        ");
+            SELECT
+                products.*,
+                reviews.*
+            FROM
+                reviews
+                INNER JOIN products ON reviews.reviewable_id = products.id
+                WHERE
+                    reviews.reviewable_type = ?
+        ",[$product::class]);
 
         dd($query);
     }
 
     #[NoReturn] public function test_seven()
     {
-        OrderItem::factory(5)->create();
+        $instagram = InstagramFollowerProduct::factory()->create();
+        $product = Product::factory()->withProducible($instagram)->create();
+        OrderItem::factory(5)->withProduct($product)->create();
 
         $query = DB::select("
-            SELECT users.*,producible_type
-            FROM order_items
-            INNER JOIN (products,orders,users)
-            ON  products.producible_type = 'InstagramPage'
-            AND order_items.product_id = products.id
-            AND order_items.order_id = orders.id
-            AND orders.user_id = users.id
-        ");
+            SELECT
+                users.*,
+                producible_type
+            FROM
+                users
+                INNER JOIN orders ON orders.user_id = users.id
+                INNER JOIN order_items ON order_items.order_id = orders.id
+                INNER JOIN products ON order_items.product_id = products.id
+            WHERE
+                products.producible_type = ?
+                AND order_items.created_at > date_sub(now(), INTERVAL 1 MONTH)
+        ",[$instagram::class]);
 
         dd($query);
     }
 
     #[NoReturn] public function test_eight()
     {
-        $category = Category::factory()->create([
-            'name' => 'child'
-        ]);
-
-        $product = Product::factory()->create([
-            'producible_type' => 'instagramPage'
-        ]);
-
+        $category = Category::factory()->create();
+        $instagram = InstagramFollowerProduct::factory()->create();
+        $product = Product::factory()->withProducible($instagram)->create();
         ProductCategory::factory()->withProduct($product)->withCategory($category)->count(5)->create();
 
-        $query = DB::update("
-            UPDATE products
-            SET products.price = products.price * 100
-            WHERE id
-            IN(SELECT products.id
-               FROM product_category
-                   INNER JOIN (products,categories)
-                       ON product_category.category_id = categories.id
-                        AND product_category.product_id = products.id
-                        AND products.producible_type = 'instagramPage'
-                        AND categories.name = 'child')
+        DB::update("
+            UPDATE
+                products
+            SET
+                products.price = products.price * 100
+            WHERE
+                id IN(
+                    SELECT
+                        products.id
+                    FROM
+                        product_category
+                        INNER JOIN categories ON product_category.category_id = categories.id
+                        INNER JOIN products ON product_category.product_id = products.id
+                    WHERE
+                        products.producible_type = ?
+                )
+        ",[$instagram::class]);
+
+        $query = DB::select("
+            SELECT
+                *
+            FROM
+                products
         ");
 
-        $query1 = DB::select("
-            SELECT * FROM products
-        ");
-
-        dd($query1);
+        dd($query);
     }
 
     #[NoReturn] public function test_nine()
@@ -176,66 +224,69 @@ class RawQueryTest extends TestCase
         User::factory()->create();
         OrderItem::factory(5)->create();
 
-        $query = DB::delete("
-            DELETE users,order_items,orders
-            FROM users
-            LEFT JOIN (order_items, orders)
-                   ON (
-                orders.id = order_items.order_id
-                AND orders.user_id = users.id
-            )
-             WHERE orders.id IS NULL OR order_items.created_at < date_sub(now(),INTERVAL 7 DAY)
+        DB::delete("
+            DELETE users,
+                order_items,
+                orders
+            FROM
+                users
+                LEFT JOIN orders ON orders.user_id = users.id
+                LEFT JOIN order_items ON orders.id = order_items.order_id
+            WHERE
+                orders.id IS NULL
+                OR order_items.created_at < date_sub(now(), INTERVAL 7 DAY)
         ");
 
-        $query1 = DB::select('
-            SELECT * FROM users
+        $query = DB::select('
+            SELECT
+                *
+            FROM
+                users
         ');
 
-        dd($query1);
+        dd($query);
     }
 
     #[NoReturn] public function test_ten()
     {
         DB::insert('
                         INSERT INTO users
-                        (name,email,password)
+                            (name,email,password)
                         VALUES
-                        ("ali","ali@gmail.com",123243284)
+                            ("ali","ali@gmail.com",123243284)
     ');
         DB::insert('
                         INSERT INTO instagram_follower_products
-                        (price_per_follower,provider_name,service_quality)
+                            (price_per_follower,provider_name,service_quality)
                         VALUES
-                        (11,"reza",11),
-                        (2,"kazem",3)
+                            (11,"reza",11),
+                            (2,"kazem",3)
     ');
         DB::insert('
                         INSERT INTO instagram_page_products
-                        (follower_count,username,following_count,is_visible,posts_count)
+                            (follower_count,username,following_count,is_visible,posts_count)
                         VALUES
-                        (5,"mohammad",8,true,10)
+                            (5,"mohammad",8,true,10)
     ');
         DB::insert('
                         INSERT INTO products
-                        (price,producible_id,producible_type)
+                            (price,producible_id,producible_type)
                         VALUES
-                        (10,1,"App\\InstagramPageProduct"),
-                        (12,1,"App\\InstagramFollowerProduct"),
-                        (14,2,"App\\InstagramFollowerProduct")
+                            (10,1,"App\\InstagramPageProduct"),
+                            (12,1,"App\\InstagramFollowerProduct")
     ');
         DB::insert('
                         INSERT INTO orders
-                        (status,user_id)
+                            (status,user_id)
                         VALUES
-                        ("completed",1)
+                            ("completed",1)
     ');
         DB::insert('
                         INSERT INTO order_items
-                        (product_id,quantity,price,order_id)
+                            (product_id,quantity,price,order_id)
                         VALUES
-                        (1,1,10,1),
-                        (2,1,20,1),
-                        (3,1,30,1)
+                            (1,1,10,1),
+                            (2,1,20,1)
     ');
         dd(Order::all());
     }
@@ -245,7 +296,7 @@ class RawQueryTest extends TestCase
         $products = Product::factory()->create();
         Review::factory()->withReviewable($products)->count(5)->create();
 
-        $query = DB::select("
+        DB::select("
             UPDATE
                 products
             SET
@@ -257,7 +308,7 @@ class RawQueryTest extends TestCase
                             reviews
                         WHERE
                             reviewable_id = products.id
-                            AND reviewable_type = 'product'
+                            AND reviewable_type = ?
                     ) > 8 THEN price * 1.1
                     WHEN (
                         SELECT
@@ -266,16 +317,18 @@ class RawQueryTest extends TestCase
                             reviews
                         WHERE
                             reviewable_id = products.id
-                            AND reviewable_type = 'product'
+                            AND reviewable_type = ?
                     ) < 4 THEN price * 0.9
                     ELSE price
                 END;
+        ",[$products::class,$products::class]);
+
+        $query = DB::select("
+            SELECT
+                *
+            FROM products
         ");
 
-        $query1 = DB::select("
-            SELECT * FROM products
-        ");
-
-        dd($query1);
+        dd($query);
     }
 }
