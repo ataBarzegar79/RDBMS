@@ -32,8 +32,8 @@ class ProductFactory extends Factory
     {
         return $this->state(
             [
-                'reviewable_id' => $producible,
-                'reviewable_type' => $producible::class
+                'producible_id' => $producible,
+                'producible_type' => $producible::class
             ]
         );
     }

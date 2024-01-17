@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\InstagramFollowerProduct;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,16 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-//        $products = Product::factory(10)->create();
-//        $products->each(function (Product $product){
-//            Review::factory()->create([
-//                'reviewable_id' => $product->id,
-//                'reviewable_type' => 'Product'
-//            ]);
-//        });
-//        Review::factory(10)->create([
-//            'reviewable_id' => 1,
-//            'reviewable_type' => 'Product'
-//        ]);
+        $instagram = InstagramFollowerProduct::factory()->create();
+        Product::factory()->withProducible($instagram)->create();
     }
 }
