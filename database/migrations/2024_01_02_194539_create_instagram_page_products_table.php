@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('instagram_page_products', function (Blueprint $table) {
             $table->id();
+            $table->integer('follower_count');
+            $table->string('username')->unique();
+            $table->integer('following_count');
+            $table->boolean('is_visible');
+            $table->string('bio')->nullable();
+            $table->integer('posts_count');
             $table->timestamps();
         });
     }
@@ -22,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('instagram_page_products');
     }
 };
