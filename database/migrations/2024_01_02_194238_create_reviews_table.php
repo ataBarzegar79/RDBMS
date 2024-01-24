@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('follower_products', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->unsignedFloat('price_per_follower');
-            $table->string('provider_name')->unique();
-            $table->unsignedInteger('service_quantity');
-            $table->string('follower_charge_speed');
-            $table->timestamp('deleted_at');
+            $table->string('content');
+            $table->tinyInteger('rate');
+            $table->foreignId('user_id')->constrained();
+            $table->morphs('reviewable');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('follower_products');
+        Schema::dropIfExists('reviews');
     }
 };
